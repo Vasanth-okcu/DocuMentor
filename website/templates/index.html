@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 30px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Upload Multiple Files</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="fileInput">Choose files (PDF, DOC, TXT):</label>
+                <input type="file" class="form-control" id="fileInput" name="files" multiple required>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+
+        <div class="result" id="result" style="display:none;">
+            <h4>Extracted Data:</h4>
+            <pre id="extractedData"></pre>
+        </div>
+    </div>
+
+    <!-- Link to the external JavaScript file -->
+    <script src="/static/script.js"></script>
+</body>
+</html>
