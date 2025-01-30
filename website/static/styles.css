@@ -1,0 +1,65 @@
+body {
+    background-color: #f4f7fc;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.container-fluid {
+    display: flex;
+    min-height: 100vh;
+}
+
+.left-sidebar {
+    background-color: #232323;
+    color: white;
+    width: 250px;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    height: 100%;
+    transition: left 0.3s ease;
+}
+
+.left-sidebar.open {
+    left: 0;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    margin-left: 0;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.open-sidebar {
+    margin-left: 250px;
+}
+
+.btn-custom {
+    background-color: #5C6BC0;
+    color: white;
+}
+
+.uploaded-files {
+    display: none;
+}
+
+.uploaded-files.active {
+    display: block;
+}
+
+.toggle-btn {
+    cursor: pointer;
+}
+
+.url-placeholder {
+    display: none;
+}
+
+.bg-dark {
+    background-color: #121212 !important;
+}
+
+.text-light {
+    color: #fff !important;
+}
