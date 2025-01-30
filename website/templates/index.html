@@ -3,37 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>DocuMentor AI</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            padding: 30px;
+            background-color: #f4f7fc;
+            transition: background-color 0.3s, color 0.3s;
         }
-        .result {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
+        .container-fluid {
+            display: flex;
+            min-height: 100vh;
+        }
+        .left-sidebar {
+            background-color: #232323;
+            color: white;
+            width: 250px;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: -250px;
+            height: 100%;
+            transition: left 0.3s ease;
+        }
+        .left-sidebar.open {
+            left: 0;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content.open-sidebar {
+            margin-left: 250px;
+        }
+        .btn-custom {
+            background-color: #5C6BC0;
+            color: white;
+        }
+        .uploaded-files {
+            display: none;
+        }
+        .uploaded-files.active {
+            display: block;
+        }
+        .toggle-btn {
+            cursor: pointer;
+        }
+        .url-placeholder {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Upload Multiple Files</h2>
-        <form id="uploadForm" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="fileInput">Choose files (PDF, DOC, TXT):</label>
-                <input type="file" class="form-control" id="fileInput" name="files" multiple required>
+    <div class="container-fluid">
+        <!-- Left Sidebar -->
+        <div class="left-sidebar" id="leftSidebar">
+            <h4>DocuMentor AI</h4>
+            <button class="btn btn-custom w-100 mb-3" id="loginBtn">Login</button>
+            <input type="file" id="fileInput" class="form-control mb-3" multiple style="display: none;">
+            <button class="btn btn-custom w-100 mb-3" id="uploadBtn">Upload Files</button>
+            <button class="btn btn-custom w-100 mb-3" id="deleteAllBtn">Delete All</button>
+            <hr>
+            <h5>Uploaded Files</h5>
+            <p id="noFilesText" class="text-muted">No files uploaded</p>
+            <ul id="uploadedFiles" class="list-unstyled uploaded-files">
+                <!-- Dynamically added files will appear here -->
+            </ul>
+            <p id="fileCount">Files: 0</p>
+            
+            <hr>
+            <h5>Uploaded URLs</h5>
+            <div id="urlPlaceholders" class="url-placeholder">
+                <input type="text" class="form-control mb-3" placeholder="Enter URL">
+                <input type="text" class="form-control mb-3" placeholder="Enter URL">
             </div>
-            <button type="submit" class="btn btn-primary">Upload</button>
-        </form>
+            <p id="urlCount">URLs: 0</p>
+            <button class="btn btn-custom w-100 mb-3" id="uploadUrlBtn">Add URL</button>
+        </div>
 
-        <div class="result" id="result" style="display:none;">
-            <h4>Extracted Data:</h4>
-            <pre id="extractedData"></pre>
+        <!-- Main Content Area -->
+        <div class="main-content" id="mainContent">
+            <!-- Header with options -->
+            <div class="d-flex justify-content-between mb-4">
+                <button class="btn btn-light toggle-btn" id="toggleSidebarBtn">☰</button>
+                <div>
+                    <button class="btn btn-light toggle-btn" id="toggleModeBtn">Day</button>
+                    <button class="btn btn-light">Download PDF</button>
+                    <button class="btn btn-light">Sign In</button>
+                    <button class="btn btn-light">Guest Mode</button>
+                </div>
+            </div>
+            
+            <h2>Welcome to DocuMentor AI</h2>
+            <p>"Hello! I'm your AI assistant. How can I help you today?"</p>
+            
+            <!-- Chat Section -->
+            <div class="text-bar">
+                <input type="text" class="form-control" placeholder="Type your message...">
+                <button class="btn btn-primary w-100 mt-2">Ask ➡</button>
+            </div>
+
+            <!-- Research & URL Section -->
+            <div class="mt-4">
+                <button class="btn btn-outline-primary mr-2">URL</button>
+                <button class="btn btn-outline-primary">Research</button>
+            </div>
         </div>
     </div>
 
-    <!-- Link to the external JavaScript file -->
-    <script src="/static/script.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+    <!-- Custom JS for interaction -->
+    <script>
+        let fileCount = 0;
+        let urlCount = 0;
+
+        // Toggle Dark/Day mode
+        document.querySelector('#toggleModeBtn').addEventListener('click', function () {
+            document.body.classList.toggle('bg-dark');
+            document.body.classList.toggle('text-light');
+            const modeBtn = document.querySelector('#toggleModeBtn');
+            modeBtn.textContent = modeBtn.textContent === 'Day' ? 'Night' : 'Day';
+        });
+
+        // Login button functionality
+        document.querySelector('#loginBtn').addEventListener('click', function() {
+            alert('Redirecting to Login...');
+            // Add login logic here
+        });
+
+        // Handle file upload
+        document.querySelector('#uploadBtn').addEventListener('click', function() {
+            document.querySelector('#fileInput').click();  // Trigger the file input click
+        });
+
+        document.querySelector('#fileInput').addEventListener('change', function(event) {
+            const uploadedFiles = document.querySelector('#uploadedFiles');
+            const noFilesText = document.querySelector('#noFilesText');
+            const fileCountDisplay = document.querySelector('#fileCount');
+            
+            const files = event.target.files;
+            const totalFiles = fileCount + files.length;
+            if (totalFiles <= 5) {
+                Array.from(files).forEach(file => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `${file.name} <button class="btn btn-danger btn-sm" onclick="removeFile(this)">❌</button>`;
+                    uploadedFiles.appendChild(li);
+                });
+                
+                fileCount += files.length;
+                fileCountDisplay.textContent = `Files: ${fileCount}`;
+                
+                if (fileCount > 0) {
+                    noFilesText.style.display = 'none';
+                    uploadedFiles.classList.add('active');
+                }
+
+                // Update URL placeholders based on file count
+                updateUrlPlaceholders();
+            }
+        });
+
+        // Remove file from list (optional)
+        function removeFile(button) {
+            button.parentElement.remove();
+            fileCount--;
+            const uploadedFiles = document.querySelector('#uploadedFiles');
+            const fileCountDisplay = document.querySelector('#fileCount');
+            
+            fileCountDisplay.textContent = `Files: ${fileCount}`;
+
+            // Hide file list if no files left
+            if (fileCount === 0) {
+                document.querySelector('#noFilesText').style.display = 'block';
+                uploadedFiles.classList.remove('active');
+            }
+
+            // Update URL placeholders
+            updateUrlPlaceholders();
+        }
+
+        // Handle URL upload
+        document.querySelector('#uploadUrlBtn').addEventListener('click', function() {
+            if (urlCount + fileCount < 5) {
+                document.querySelector('#urlPlaceholders').style.display = 'block';
+            }
+        });
+
+        // Update URL placeholders visibility based on file count
+        function updateUrlPlaceholders() {
+            const remainingSlots = 5 - fileCount;
+            const urlPlaceholders = document.querySelector('#urlPlaceholders');
+            const urlInputs = urlPlaceholders.querySelectorAll('input');
+            
+            // Show only the remaining number of URL placeholders
+            urlInputs.forEach((input, index) => {
+                if (index < remainingSlots) {
+                    input.style.display = 'block';
+                } else {
+                    input.style.display = 'none';
+                }
+            });
+
+            // Update URL count display
+            document.querySelector('#urlCount').textContent = `URLs: ${urlCount}`;
+        }
+
+        // Delete all files
+        document.querySelector('#deleteAllBtn').addEventListener('click', function() {
+            const uploadedFiles = document.querySelector('#uploadedFiles');
+            const fileCountDisplay = document.querySelector('#fileCount');
+            
+            uploadedFiles.innerHTML = '';  // Clear the list
+            fileCount = 0;  // Reset file count
+            fileCountDisplay.textContent = 'Files: 0';  // Reset file count
+            document.querySelector('#noFilesText').style.display = 'block';  // Show 'No files uploaded' text
+
+            // Update URL placeholders
+            updateUrlPlaceholders();
+        });
+
+        // Toggle Sidebar visibility (☰ button)
+        document.querySelector('#toggleSidebarBtn').addEventListener('click', function() {
+            const sidebar = document.getElementById('leftSidebar');
+            const mainContent = document.getElementById('mainContent');
+            sidebar.classList.toggle('open');
+            mainContent.classList.toggle('open-sidebar');
+        });
+    </script>
 </body>
 </html>
